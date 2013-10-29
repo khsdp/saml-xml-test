@@ -1,0 +1,10 @@
+<saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Version="2.0" ID="a123" IssueInstant="2013-06-27T13:07:12Z">
+  <saml:Issuer NameQualifier="test">test</saml:Issuer>
+  <saml:AttributeStatement>
+  </saml:AttributeStatement>
+  <saml:AttributeStatement>
+    <saml:Attribute Name="somename" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.w3.org/2001/XMLSchema">
+      <saml:AttributeValue xsi:type="string">Hello World!</saml:AttributeValue>
+    </saml:Attribute>
+  </saml:AttributeStatement>
+</saml:Assertion>

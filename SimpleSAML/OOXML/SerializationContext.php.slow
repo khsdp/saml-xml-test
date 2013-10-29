@@ -1,0 +1,67 @@
+<?php
+
+namespace SimpleSAML\OOXML;
+
+class SerializationContext {
+
+	protected $register;
+
+	protected $namespaces = array();
+
+	protected $document;
+	protected $root;
+
+	public function __construct($register = NULL) {
+		if ($register === NULL) {
+			$register = Register::getDefault();
+		}
+		$this->register = $register;
+		$this->document = new \DOMDocument();
+	}
+
+	public function qName($namespaceURI, $localName) {
+		if (!isset($this->namespaces[$namespaceURI])) {
+			$prefix = $this->register->getPrefix($namespaceURI);
+			$this->namespaces[$namespaceURI] = $prefix;
+			if ($this->root) {
+				/* Add namespace declaration to the root. */
+				$this->root->setAttributeNS($namespaceURI, $prefix . ':__init_ns__', 'tmp');
+				$this->root->removeAttributeNS($namespaceURI, '__init_ns__');
+			}
+		}
+		return $this->namespaces[$namespaceURI] . ':' . $localName;
+	}
+
+	public function addElement(\DOMElement $parent = NULL, $namespaceURI, $localName) {
+		if ($parent === NULL) {
+			/* This is the root element. This should be the first element, and no namespaces
+			 * should have been allocated before. If a namespace had been added before, it
+			 * will be missing from the root element. Therefore we have an assertion here
+			 * checking that this isn't the case.
+			 */
+			assert('empty($this->namespaces)');
+		}
+
+		$qName = $this->qName($namespaceURI, $localName);
+		$element = $this->document->createElementNS($namespaceURI, $qName);
+		if ($parent !== NULL) {
+			/* We should already have a root element. */
+			assert('$this->root !== NULL');
+			$parent->appendChild($element);
+			return $element;
+		}
+
+		/* This is the root element. */
+		assert('$this->root === NULL');
+		$this->document->appendChild($element);
+		$this->root = $element;
+
+		return $element;
+	}
+
+	public function addText(\DOMElement $parent, $text) {
+		$te = $this->document->createTextNode($text);
+		$parent->appendChild($te);
+	}
+
+}
